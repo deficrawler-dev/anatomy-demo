@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anatomy Demo</title>
+  <style>
+    html,body { margin:0; height:100%; background:#0b0b0b; }
+    model-viewer { width:100vw; height:100vh; background:#0b0b0b; }
+    #note { position:fixed; left:10px; bottom:10px; color:#fff; font:13px system-ui; }
+  </style>
+
+  <!-- model-viewer -->
+  <script type="module"
+    src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js">
+  </script>
+</head>
+<body>
+
+  <!-- Tip: you can change the model with ?src=<url-or-file> -->
+  <model-viewer id="mv"
+    src="cm0139_myo.glb"
+    camera-controls
+    auto-rotate
+    ar
+    environment-image="neutral"
+    poster=""
+    exposure="0.9"
+    tone-mapping="aces">
+  </model-viewer>
+
+  <div id="note">Loading…</div>
+
+  <script>
+    // Allow ?src= to override the model if you ever need it
+    const u = new URL(location.href);
+    const override = u.searchParams.get('src');
+    if (override) document.querySelector('#mv').setAttribute('src', override);
+
+    const mv = document.querySelector('#mv');
+    mv.addEventListener('load', () => (document.getElementById('note').textContent = ''));
+    mv.addEventListener('error', e => {
+      document.getElementById('note').textContent = 'Load error (open DevTools > Network).';
+      console.error(e);
+    });
+  </script>
+</body>
+</html>
