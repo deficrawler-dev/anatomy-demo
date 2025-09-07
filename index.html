@@ -97,6 +97,47 @@
 
     /* Utility */
     .muted{color:var(--text-dim)}
+
+    /* --- NEW: Live Demo (two-column video slider) --- */
+    .live.card{display:grid;gap:16px}
+    @media (min-width: 860px){
+      .live.card{grid-template-columns: 1.1fr 1fr}
+    }
+    .live .left p{color:var(--text-dim);margin:.35rem 0 0}
+
+    .videoStage{
+      position:relative; overflow:hidden;
+      border-radius:14px; border:1px solid rgba(255,255,255,.06);
+      background:#0a1226;
+      box-shadow: var(--shadow-mag), var(--shadow-cyan);
+    }
+    .videoTrack{
+      display:flex; width:200%; transition:transform .35s ease;
+    }
+    .videoPane{
+      width:50%; padding:0; margin:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .videoPane video{
+      width:100%; height:auto; display:block;
+      background:#000; border:0; outline:none;
+    }
+    .vidControls{
+      display:flex; gap:10px; flex-wrap:wrap;
+      justify-content:space-between; align-items:center;
+      padding:10px 0 0;
+    }
+    .vidLeft{display:flex; gap:10px; flex-wrap:wrap}
+    .smallBtn{
+      appearance:none;border:1px solid rgba(255,255,255,.08);
+      background:#122147; color:#e9f2ff; cursor:pointer;
+      padding:8px 12px; border-radius:999px; font-weight:700;
+    }
+    .primaryGrad{
+      background:var(--g-btn); color:#061222; border:0;
+      box-shadow:var(--shadow-mag),var(--shadow-cyan)
+    }
+    .tiny{font-size:.9rem}
   </style>
 </head>
 <body>
@@ -119,7 +160,7 @@
         We combine Unreal Engine 5, AI super-resolution for MRI &amp; CT, infrared hand-tracking, and the latest autostereoscopic displays so clinicians can explore anatomy in real-time—no headset required.
       </p>
 
-      <div class="hero-actions">
+    <div class="hero-actions">
         <a class="btn btn-primary" href="#demo">Try the Interactive Demo</a>
         <a class="btn btn-ghost" href="#story">Read the Story</a>
       </div>
@@ -147,6 +188,47 @@
       <p class="note">
         These 3D visuals are <em>demo anatomy</em> to demonstrate HOLOLUX interaction only. Pinch to zoom, drag to rotate, two-finger drag to pan. Tap the <strong>AR</strong> icon on supported phones.
       </p>
+    </section>
+
+    <!-- NEW: LIVE DEMONSTRATION (two-column) -->
+    <section class="section card live" id="live">
+      <div class="left">
+        <h2>Live Demonstration of HOLOLUX</h2>
+        <p>
+          This live demo shows how our glasses-free 3D interaction feels in practice.
+          With just your hands—no headset—you can rotate, zoom, and explore anatomy as if it’s floating in front of you.
+        </p>
+      </div>
+
+      <div class="right">
+        <div class="videoStage">
+          <div class="videoTrack" id="videoTrack" style="transform:translateX(0%)">
+            <div class="videoPane">
+              <video id="vid0" controls playsinline preload="metadata">
+                <!-- Using a CDN proxy for reliable playback from GitHub -->
+                <source src="https://cdn.jsdelivr.net/gh/deficrawler-dev/anatomy-demo@main/ssstwitter.com_1756943730222.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div class="videoPane">
+              <video id="vid1" controls playsinline preload="metadata">
+                <source src="https://cdn.jsdelivr.net/gh/deficrawler-dev/anatomy-demo@main/ssstwitter.com_1756953307211.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </div>
+
+        <div class="vidControls">
+          <div class="vidLeft">
+            <button class="smallBtn" id="prevBtn">◀︎ Prev</button>
+            <button class="smallBtn primaryGrad" id="nextBtn">Watch next ▶︎</button>
+          </div>
+          <a id="dlBtn" class="smallBtn tiny" href="https://cdn.jsdelivr.net/gh/deficrawler-dev/anatomy-demo@main/ssstwitter.com_1756943730222.mp4" download>
+            Download current
+          </a>
+        </div>
+      </div>
     </section>
 
     <!-- STORY -->
@@ -222,6 +304,32 @@
         viewer.src = chip.dataset.src;
       });
     });
+
+    // ---- NEW: Live video slider controls ----
+    const track = document.getElementById('videoTrack');
+    const v0 = document.getElementById('vid0');
+    const v1 = document.getElementById('vid1');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dlBtn = document.getElementById('dlBtn');
+
+    const videoSrcs = [
+      "https://cdn.jsdelivr.net/gh/deficrawler-dev/anatomy-demo@main/ssstwitter.com_1756943730222.mp4",
+      "https://cdn.jsdelivr.net/gh/deficrawler-dev/anatomy-demo@main/ssstwitter.com_1756953307211.mp4"
+    ];
+    let idx = 0;
+
+    function show(i){
+      idx = (i + videoSrcs.length) % videoSrcs.length;
+      track.style.transform = `translateX(${idx===0 ? '0%' : '-50%'})`;
+      // Pause both when switching
+      v0.pause(); v1.pause();
+      // Update download link to the current video
+      dlBtn.href = videoSrcs[idx];
+    }
+    prevBtn.addEventListener('click', ()=> show(idx-1));
+    nextBtn.addEventListener('click', ()=> show(idx+1));
+    show(0); // init
 
     // Remove any legacy “unsupported device” notes if present
     document.querySelectorAll('.mv-unsupported,.unsupported,.device-note')
