@@ -3,338 +3,306 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>HOLOLUX — Glasses-Free 3D Medical Imaging</title>
+  <title>HOLOLUX — AI-Powered, Glasses-Free 3D Medical Imaging</title>
 
-  <!-- Fonts: clean + futuristic vibe -->
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <!-- 3D viewer -->
-  <script type="module" src="https://unpkg.com/@google/model-viewer@3.3.0/dist/model-viewer.min.js"></script>
+  <!-- Fonts with a modern, 3D-tech feel -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- model-viewer (web component) -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer@1.12.1/dist/model-viewer.min.js"></script>
 
   <style>
     :root{
-      /* Palette */
-      --navy:#101B37;       /* base */
-      --magenta:#E41376;    /* neon */
-      --cyan:#01C8EE;       /* neon */
-      --ink:#0B1120;        /* slightly darker bg */
-      --muted:#A7B0C2;
-      --fg:#E9F1FF;
-
-      --grad: linear-gradient(90deg, var(--magenta), #8f2fd8, var(--cyan));
-      --glass: rgba(255,255,255,.05);
-      --stroke: rgba(255,255,255,.08);
-
-      --radius: 14px;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --bg: #0B1328;          /* deep navy from your palette family */
+      --card: #101B37;        /* #101B37 */
+      --pink: #E41376;        /* #E41376 */
+      --cyan: #01C8EE;        /* #01C8EE */
+      --fg: #E6EEF8;
+      --muted: #9FB0C8;
+      --ring: rgba(1,200,238,.35);
+      --shadow: 0 8px 30px rgba(1,200,238,.12), 0 10px 30px rgba(228,19,118,.10);
     }
-
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
       background:
-        radial-gradient(1200px 1200px at 90% -10%, rgba(1,200,238,.08), transparent 60%),
-        radial-gradient(1000px 1000px at 0% -20%, rgba(228,19,118,.08), transparent 50%),
-        var(--ink);
+        radial-gradient(1200px 600px at 80% -10%, rgba(1,200,238,.14), transparent 60%),
+        radial-gradient(900px 500px at 10% 0%, rgba(228,19,118,.12), transparent 50%),
+        var(--bg);
       color:var(--fg);
-      font:16px/1.5 'Sora', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
+      line-height:1.5;
+      -webkit-font-smoothing:antialiased;
     }
-
-    .wrap{max-width:1100px;margin:0 auto;padding:clamp(16px,3vw,24px)}
-
-    /* ===== Header / CA ===== */
+    .container{
+      width:100%;
+      max-width:1000px;
+      margin:0 auto;
+      padding:24px clamp(16px,4vw,28px);
+    }
     header{
-      position:sticky; top:0; z-index:10;
-      backdrop-filter: blur(10px);
-      background: linear-gradient(180deg, rgba(16,27,55,.8), rgba(16,27,55,.45));
-      border-bottom:1px solid var(--stroke);
-    }
-    .nav{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:12px;margin-bottom:18px;
     }
     .brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight:700; letter-spacing:.4px;
+      display:flex;align-items:center;gap:10px;
+      font-family:"Space Grotesk",Inter,sans-serif;
+      font-weight:700;
+      letter-spacing:.4px;
+      font-size:clamp(18px,3.4vw,22px);
     }
     .badge{
-      padding:.15rem .45rem; border:1px solid var(--stroke);
-      border-radius:999px; color:var(--muted); font-size:.75rem;
+      font-size:12px;
+      font-weight:600;
+      color:#fff;
+      background:linear-gradient(90deg,var(--pink),var(--cyan));
+      padding:6px 10px;border-radius:999px;opacity:.9;
     }
 
+    /* === CA box === */
     .ca{
-      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
-      background:var(--glass); border:1px solid var(--stroke); border-radius:999px;
-      padding:6px 8px;
-    }
-    .ca input{
-      width:min(75vw,520px);
-      background:transparent; border:0; color:var(--fg);
-      font:600 14px/1 'Inter', system-ui; letter-spacing:.2px;
-      outline:none;
-    }
-    .btn{
-      appearance:none; border:1px solid var(--stroke);
-      background:var(--grad); color:#081018; /* high contrast on gradient */
-      padding:.55rem .8rem; border-radius:999px; font-weight:700;
-      cursor:pointer; box-shadow:var(--shadow);
-      transition:transform .06s ease, filter .15s ease;
-    }
-    .btn:hover{ transform:translateY(-1px); filter:saturate(1.15) }
-    .btn.ghost{
-      background:transparent; color:var(--fg); border-color:var(--stroke);
-    }
-
-    /* ===== Hero ===== */
-    .hero{ padding:clamp(26px,6vw,48px) 0 }
-    .title{
-      font-size:clamp(26px,5vw,40px); margin:0 0 .4rem 0; line-height:1.15;
-    }
-    .subtitle{ color:var(--muted); max-width:800px; margin:.4rem 0 1rem 0 }
-
-    .ctaRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:.5rem }
-
-    /* ===== 3D Section ===== */
-    .viewerCard{
-      margin-top:clamp(16px,4vw,24px);
-      background:linear-gradient(180deg, rgba(16,27,55,.7), rgba(11,17,32,.6));
-      border:1px solid var(--stroke); border-radius:var(--radius);
-      overflow:hidden; box-shadow:var(--shadow);
-    }
-    .viewerTop{
-      display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
-      padding:12px 14px; border-bottom:1px solid var(--stroke);
-      background:radial-gradient(900px 900px at 10% -20%, rgba(228,19,118,.15), transparent 55%);
-    }
-    .chips{ display:flex; gap:8px; flex-wrap:wrap }
-    .chip{
-      border:1px solid var(--stroke); color:var(--fg);
-      background:rgba(255,255,255,.03);
-      border-radius:999px; padding:.45rem .8rem; cursor:pointer; font-weight:600;
-      transition:all .12s ease;
-    }
-    .chip:hover{ transform:translateY(-1px) }
-    .chip.active{ background:var(--grad); color:#051021; border-color:transparent }
-
-    model-viewer{
-      width:100%; height:62vh; min-height:380px; background:#0A0F1E;
-      --progress-bar-color: var(--cyan);
-      --poster-color: #0A0F1E;
-    }
-    .hint{
-      padding:10px 14px; font-size:.9rem; color:var(--muted);
-      border-top:1px solid var(--stroke);
-      background:rgba(255,255,255,.02);
-    }
-
-    /* ===== Story & Thumbnails ===== */
-    .grid{
-      display:grid; gap:clamp(12px,2.6vw,18px);
-      grid-template-columns: 1fr;
-    }
-    @media (min-width: 900px){
-      .grid{ grid-template-columns: 1.2fr .8fr }
-    }
-
-    .card{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--stroke);
-      border-radius:var(--radius);
-      padding:clamp(14px,2.4vw,20px);
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+      background:rgba(16,27,55,.75);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:12px;padding:10px 12px;
       box-shadow:var(--shadow);
     }
-    .card h3{ margin:0 0 .4rem 0; font-size:clamp(18px,2.6vw,22px) }
-    .card p{ margin:.4rem 0; color:var(--fg) }
-
-    .thumbs{
-      display:grid; gap:10px;
-      grid-template-columns: repeat(2, minmax(0,1fr));
+    .ca small{color:var(--muted)}
+    .ca-value{
+      font-family:"Space Grotesk",monospace;
+      font-size:13px;
+      padding:6px 10px;border-radius:8px;
+      background:rgba(255,255,255,.04);
+      border:1px dashed rgba(255,255,255,.08);
+      word-break:break-all;
     }
-    .thumb{
-      aspect-ratio: 16/9; border-radius:10px; overflow:hidden;
-      border:1px solid var(--stroke); background:#0E162B;
-      display:flex; align-items:center; justify-content:center;
-      color:var(--muted); font:600 13px/1 'Inter';
+    .btn{
+      appearance:none;border:0;cursor:pointer;
+      font-weight:600;color:#07111f;background:#fff;
+      padding:10px 14px;border-radius:999px;
+      transition:.15s transform ease,.15s filter ease;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{
+      color:#fff;background:linear-gradient(90deg,var(--pink),var(--cyan));
+      border:1px solid rgba(255,255,255,.12);box-shadow:var(--shadow)
+    }
+    .btn-ghost{
+      color:#fff;background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08)
     }
 
-    /* ===== Footer ===== */
+    h1{
+      font-family:"Space Grotesk",Inter,sans-serif;
+      font-weight:700;letter-spacing:.2px;
+      margin:14px 0 10px;
+      font-size:clamp(26px,6.2vw,40px);
+      line-height:1.05;
+    }
+    p.lead{
+      color:var(--muted);
+      font-size:clamp(14px,3.6vw,18px);
+      margin:0 0 16px;
+    }
+
+    .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 22px}
+    .chip-row{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+
+    /* === Viewer Card === */
+    .viewer-card{
+      background:linear-gradient(180deg, rgba(16,27,55,.75), rgba(16,27,55,.55));
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:16px;overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+    .viewer-header{
+      padding:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.06)
+    }
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tabs .btn-ghost{padding:8px 12px}
+    model-viewer{
+      width:100%;height:min(65vh,520px);background:#050913;
+      --progress-bar-color: var(--cyan);
+    }
+
+    /* === Content Sections === */
+    section{margin:28px 0}
+    .card{
+      background:rgba(16,27,55,.75);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:16px;padding:18px;
+      box-shadow:var(--shadow)
+    }
+    .card h3{
+      font-family:"Space Grotesk";
+      margin:0 0 10px;font-size:clamp(18px,4.6vw,24px)
+    }
+    ul{margin:.2rem 0 .2rem 1.2rem;padding:0}
+    li{margin:.25rem 0;color:var(--fg)}
+
+    /* Join section links */
+    .link-grid{display:grid;grid-template-columns:1fr;gap:10px}
+    .x-link{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.05);color:#fff;text-decoration:none;
+      box-shadow:var(--shadow)
+    }
+    .x-link span{color:var(--muted);font-size:14px}
+
     footer{
-      margin:32px 0 20px 0; color:var(--muted); text-align:center;
+      color:var(--muted);font-size:12px;margin:28px 0 8px;text-align:center
     }
-    a{ color:#78e7ff; text-decoration:none }
-    a:hover{text-decoration:underline}
-    .toast{
-      position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
-      background:#0b1120; border:1px solid var(--stroke); padding:10px 14px;
-      border-radius:10px; box-shadow:var(--shadow); display:none;
+
+    /* ===== Mobile tuning (requested) ===== */
+    @media (max-width: 640px){
+      .container{padding:20px 16px}
+      .ca-value{display:none}                 /* 1) Hide CA value on mobile */
+      .brand{font-size:20px}
+      .badge{display:none}
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <div class="brand">HOLOLUX</div>
 
-  <!-- ===== HEADER ===== -->
-  <header>
-    <div class="wrap nav">
-      <div class="brand">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-          <path d="M3 12l9-9 9 9-9 9-9-9z" stroke="url(#g1)" stroke-width="2" />
-          <defs>
-            <linearGradient id="g1" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#E41376"/><stop offset=".6" stop-color="#8f2fd8"/><stop offset="1" stop-color="#01C8EE"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <span>HOLOLUX</span>
-        <span class="badge">Glasses-Free 3D</span>
+      <!-- Chain address block -->
+      <div class="ca" role="group" aria-label="Contract address">
+        <small>CA</small>
+        <code class="ca-value" id="caText">9KL4RGf9Tpobh5Spg9RPJMWs5gxQZt2hi18EjYEaBAGS</code>
+        <button class="btn btn-ghost" id="copyBtn" aria-label="Copy contract address">Copy CA</button>
       </div>
+    </header>
 
-      <!-- Copyable CA -->
-      <div class="ca">
-        <input id="caInput" type="text" readonly
-               value="9KL4RGf9Tpobh5Spg9RPJMWs5gxQZt2hi18EjYEaBAGS" />
-        <button class="btn" id="copyBtn">Copy CA</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- ===== HERO ===== -->
-  <section class="wrap hero">
-    <h1 class="title">AI-Powered, Glasses-Free 3D Medical Imaging</h1>
-    <p class="subtitle">
-      We combine Unreal Engine 5, AI super-resolution for MRI and CT, infrared hand-tracking, and the latest autostereoscopic displays so clinicians can literally reach into scans—no headset required.
+    <h1>AI-Powered, Glasses-Free 3D Medical Imaging</h1>
+    <p class="lead">
+      We combine Unreal Engine 5, AI super-resolution for MRI & CT, infrared hand-tracking,
+      and the latest autostereoscopic displays so clinicians can explore anatomy in real time—no
+      headset required.
     </p>
-    <div class="ctaRow">
-      <a class="btn" href="#demo">Try the Interactive Demo</a>
-      <a class="btn ghost" href="#story">Read the Story</a>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#viewer">Try the Interactive Demo</a>
+      <a class="btn btn-ghost" href="#story">Read the Story</a>
     </div>
 
-    <!-- Viewer Card -->
-    <div id="demo" class="viewerCard">
-      <div class="viewerTop">
-        <strong>Interactive 3D (demo models)</strong>
-        <div class="chips" id="chipbar"></div>
+    <!-- Demo Models / Viewer -->
+    <section id="viewer" class="viewer-card" aria-label="Interactive 3D (demo models)">
+      <div class="viewer-header">
+        <div class="chip">Interactive 3D (demo models)</div>
+        <div class="tabs">
+          <button class="btn btn-ghost tab" data-src="Heart.glb">Heart</button>
+          <button class="btn btn-ghost tab" data-src="brain.glb">Brain</button>
+          <button class="btn btn-ghost tab" data-src="skull.glb">Skull</button>
+        </div>
       </div>
 
+      <!-- No device warning anywhere (removed per request) -->
       <model-viewer id="mv"
-        camera-controls
-        touch-action="pan-y"
-        ar
-        ar-modes="webxr scene-viewer quick-look"
+        src="Heart.glb" exposure="0.9" shadow-intensity="1" camera-controls
+        touch-action="pan-y" tone-mapping="aces" ar ar-modes="webxr scene-viewer quick-look"
         environment-image="neutral"
-        exposure="1"
-        shadow-intensity="1"
-        style="outline:none">
-        Your device does not support the 3D viewer.
-      </model-viewer>
+      ></model-viewer>
+    </section>
 
-      <div class="hint">
-        These 3D visuals are <em>demo anatomy</em> to demonstrate HOLOLUX interaction only. Pinch to zoom, drag to rotate, two-finger drag to pan. Tap the <strong>AR</strong> icon on supported phones.
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== STORY + THUMBNAILS ===== -->
-  <section class="wrap grid" id="story">
-    <article class="card">
+    <!-- Story (shortened) -->
+    <section id="story" class="card">
       <h3>From MRI Headaches to HOLOLUX</h3>
-      <p><strong>How a Neurosurgeon and the Solana Community Are Building the Future of Medical Imaging</strong></p>
-      <p>Surgeons dislike VR headsets. They break workflow, force you to strap on bulky gear, and leave patients unable to see their own scans.</p>
-      <p>Dr. Galal A. (<a href="https://x.com/galalnsg" target="_blank">@galalnsg</a>), a practicing Ivy League neurosurgeon, saw this frustration firsthand. Passionate about both medicine and AI, he set out to create something entirely new: <strong>HOLOLUX</strong>, the world’s first AI-powered glasses-free 3D medical imaging platform.</p>
+      <p>
+        VR headsets slow surgeons down. Dr. Galal A., an Ivy-League neurosurgeon, built a better
+        way: HOLOLUX—the first AI-powered, glasses-free 3D medical imaging platform. Upload an MRI
+        or CT and see a holographic scan that you can rotate, zoom, and explore with your hands.
+      </p>
 
       <h3>A New Way to See Inside the Human Body</h3>
       <ul>
-        <li>AI super-resolution that sharpens MRI and CT scans</li>
-        <li>Infrared hand-tracking for direct interaction</li>
-        <li>Autostereoscopic 3D displays—no headset required</li>
+        <li><strong>AI super-resolution</strong> that sharpens MRI/CT scans</li>
+        <li><strong>Infrared hand-tracking</strong> for direct interaction</li>
+        <li><strong>Autostereoscopic 3D displays</strong> — no headset required</li>
       </ul>
-      <p>With HOLOLUX, any MRI or CT scan can be uploaded and instantly visualized in 3D. Stand in front of the screen and the scan appears as a hologram in the air—fully interactive. Patients finally see their condition in three dimensions.</p>
-
-      <h3>How the Solana Community Stepped In</h3>
-      <p>Tech evangelist <a href="https://x.com/Scobleizer" target="_blank">Robert Scoble</a> noticed the project. Using <a href="https://x.com/BagsApp" target="_blank">@BagsApp</a> royalty sharing powered by <a href="https://x.com/MeteoraAG" target="_blank">@MeteoraAG</a>, the community launched a coin that funnels trading fees directly into HOLOLUX development.</p>
 
       <h3>Why This Matters</h3>
       <ul>
-        <li>Dr. Galal is fully doxxed with Ivy League credentials</li>
-        <li>The prototype is live and functional</li>
-        <li>Real technology solving real medical problems</li>
+        <li>Founder is fully doxxed with Ivy credentials</li>
+        <li>Prototype is live and functional</li>
+        <li>Real technology solving real clinical problems</li>
       </ul>
+    </section>
 
-      <p>HOLOLUX shows what happens when medicine, AI, and crypto intersect—life-saving potential with global community momentum.</p>
-    </article>
-
-    <aside class="card">
-      <h3>Clips & Screens (add your thumbnails)</h3>
-      <div class="thumbs">
-        <!-- Replace src with your images or video thumbs -->
-        <a class="thumb" href="#" target="_blank">Add&nbsp;Thumbnail 1</a>
-        <a class="thumb" href="#" target="_blank">Add&nbsp;Thumbnail 2</a>
-        <a class="thumb" href="#" target="_blank">Add&nbsp;Thumbnail 3</a>
-        <a class="thumb" href="#" target="_blank">Add&nbsp;Thumbnail 4</a>
+    <!-- Join the conversation (replaces thumbnails) -->
+    <section class="card" aria-label="Community">
+      <h3>Join the Conversation</h3>
+      <div class="link-grid">
+        <a class="x-link" href="https://x.com/galalnsg" target="_blank" rel="noopener">
+          <div>
+            <strong>@galalnsg</strong><br><span>Neurosurgeon • Founder of HOLOLUX</span>
+          </div>
+          <div>Open</div>
+        </a>
+        <a class="x-link" href="https://x.com/i/communities/1963029004870373426" target="_blank" rel="noopener">
+          <div>
+            <strong>HOLOLUX Community</strong><br><span>Discuss progress, tech & previews</span>
+          </div>
+          <div>Open</div>
+        </a>
       </div>
-      <p style="margin-top:10px;color:var(--muted)">Drop your PNG/JPG links above. Each card is 16:9 and mobile-friendly.</p>
-    </aside>
-  </section>
+    </section>
 
-  <footer class="wrap">
-    <div>© <script>document.write(new Date().getFullYear())</script> HOLOLUX — Built with AI, Unreal Engine 5, and autostereoscopic 3D.</div>
-    <div class="toast" id="toast">CA copied</div>
-  </footer>
+    <footer>
+      © 2025 HOLOLUX — Built with AI, Unreal Engine 5, and autostereoscopic 3D.
+    </footer>
+  </div>
 
   <script>
-    /* ===== CA copy ===== */
-    const caInput = document.getElementById('caInput');
+    // Copy CA (mobile shows button only; desktop shows text + button)
+    const CA = "9KL4RGf9Tpobh5Spg9RPJMWs5gxQZt2hi18EjYEaBAGS";
+    const caText = document.getElementById('caText');
     const copyBtn = document.getElementById('copyBtn');
-    const toast = document.getElementById('toast');
-    copyBtn.addEventListener('click', async () => {
-      try{
-        await navigator.clipboard.writeText(caInput.value);
-        toast.style.display = 'block';
-        toast.textContent = 'CA copied';
-        setTimeout(()=> toast.style.display='none', 1200);
-      }catch(e){
-        caInput.select(); document.execCommand('copy');
-        toast.style.display = 'block';
-        toast.textContent = 'Copied (fallback)';
-        setTimeout(()=> toast.style.display='none', 1200);
+
+    function copyAddress() {
+      const text = CA;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          copyBtn.textContent = 'Copied';
+          setTimeout(()=> copyBtn.textContent = 'Copy CA', 1200);
+        }).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
       }
-    });
-
-    /* ===== 3D DEMO ===== */
-    const MODELS = [
-      { id:'heart', name:'Heart', file:'Heart.glb' },
-      { id:'brain', name:'Brain', file:'brain.glb' },
-      { id:'skull', name:'Skull', file:'skull.glb' },
-    ];
-    const mv = document.getElementById('mv');
-    const chipbar = document.getElementById('chipbar');
-    const params = new URLSearchParams(location.search);
-    const initial = params.get('src');
-
-    // build chips
-    MODELS.forEach(m=>{
-      const b = document.createElement('button');
-      b.className = 'chip';
-      b.textContent = m.name;
-      b.dataset.file = m.file;
-      b.addEventListener('click', ()=> setModel(m.file, true));
-      chipbar.appendChild(b);
-    });
-
-    function setModel(src, pushURL){
-      mv.src = src;
-      [...chipbar.children].forEach(c=>c.classList.toggle('active', c.dataset.file===src));
-      if(pushURL){
-        const url = new URL(location.href);
-        url.searchParams.set('src', src);
-        history.replaceState(null,'',url);
+      function fallbackCopy(){
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); ta.remove();
+        copyBtn.textContent = 'Copied';
+        setTimeout(()=> copyBtn.textContent = 'Copy CA', 1200);
       }
     }
-    setModel(initial || MODELS[0].file, false);
+    copyBtn.addEventListener('click', copyAddress);
+    if (caText) caText.textContent = CA;
 
-    // user-friendly loading indicator via progress event
-    mv.addEventListener('progress', e=>{
-      const p = e?.detail?.totalProgress || 0;
-      mv.style.setProperty('--progress-bar-color', p < 1 ? 'var(--cyan)' : 'var(--magenta)');
-    });
+    // Swap models with tabs; respect ?src= param if present
+    const mv = document.getElementById('mv');
+    const tabs = document.querySelectorAll('.tab');
+
+    function setActive(src){
+      mv.src = src;
+      tabs.forEach(b => b.classList.toggle('btn-primary', b.dataset.src === src));
+      tabs.forEach(b => b.classList.toggle('btn-ghost', b.dataset.src !== src));
+    }
+    tabs.forEach(b => b.addEventListener('click', () => setActive(b.dataset.src)));
+
+    const url = new URL(location.href);
+    const initial = url.searchParams.get('src');
+    if (initial) {
+      setActive(initial);
+    } else {
+      setActive('Heart.glb');
+    }
   </script>
 </body>
 </html>
