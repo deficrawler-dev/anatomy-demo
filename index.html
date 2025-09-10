@@ -52,10 +52,18 @@
     .btn-primary{background:var(--g-btn);color:#001221;box-shadow:var(--shadow-mag),var(--shadow-cyan)}
     .btn-ghost{background:#122147;color:var(--ink);border:1px solid rgba(255,255,255,.06)}
 
+    /* Small pill label */
+    .pill{display:inline-flex;align-items:center;gap:8px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+      color:var(--ink);padding:7px 12px;border-radius:999px;
+      font-weight:700;font-size:12px;letter-spacing:.2px
+    }
+    .pill .grad{background:var(--g-hero);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+
     /* HERO */
     .hero{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0) 60%);border-radius:var(--radius);padding:18px 16px;box-shadow:var(--shadow-mag),var(--shadow-cyan)}
     .hero h1{
-      font-family:"Space Grotesk",Inter,sans-serif;font-weight:800;line-height:1.05;margin:4px 0 12px;
+      font-family:"Space Grotesk",Inter,sans-serif;font-weight:800;line-height:1.05;margin:6px 0 12px;
       font-size:28px;background:var(--g-hero);-webkit-background-clip:text;background-clip:text;color:transparent;
     }
     .hero p{color:var(--text-dim);margin:0 0 14px;max-width:64ch}
@@ -155,12 +163,15 @@
 
     <!-- HERO -->
     <section class="hero">
+      <span class="pill"><span class="grad">Community-Backed</span> via BagsApp Royalties</span>
       <h1>AI-Powered, Glasses-Free 3D Medical Imaging</h1>
       <p>
-        We combine Unreal Engine 5, AI super-resolution for MRI &amp; CT, infrared hand-tracking, and the latest autostereoscopic displays so clinicians can explore anatomy in real-time—no headset required.
+        This site is a community initiative to help fund HOLOLUX development. Using BagsApp, on-chain
+        royalties from trading support continued R&amp;D—similar to a Kickstarter, powered by crypto.
+        The tech itself lets clinicians explore anatomy in real-time with no headset required.
       </p>
 
-    <div class="hero-actions">
+      <div class="hero-actions">
         <a class="btn btn-primary" href="#demo">Try the Interactive Demo</a>
         <a class="btn btn-ghost" href="#story">Read the Story</a>
       </div>
@@ -195,8 +206,8 @@
       <div class="left">
         <h2>Live Demonstration of HOLOLUX</h2>
         <p>
-          This live demo shows how our glasses-free 3D interaction feels in practice.
-          With just your hands—no headset—you can rotate, zoom, and explore anatomy as if it’s floating in front of you.
+          Watch glasses-free 3D interaction in action. With just your hands—no headset—you can rotate,
+          zoom, and explore anatomy as if it’s floating in front of you.
         </p>
       </div>
 
@@ -205,7 +216,6 @@
           <div class="videoTrack" id="videoTrack" style="transform:translateX(0%)">
             <div class="videoPane">
               <video id="vid0" controls playsinline preload="metadata">
-                <!-- Using a CDN proxy for reliable playback from GitHub -->
                 <source src="https://cdn.jsdelivr.net/gh/deficrawler-dev/anatomy-demo@main/ssstwitter.com_1756943730222.mp4" type="video/mp4">
                 Your browser does not support the video tag.
               </video>
@@ -231,25 +241,29 @@
       </div>
     </section>
 
-    <!-- STORY -->
+    <!-- STORY (reframed as community funding) -->
     <section id="story" class="section card">
-      <h2>From MRI Headaches to HOLOLUX</h2>
+      <h2>Why We’re Raising Funds for HOLOLUX</h2>
       <p class="muted">
-        VR headsets slow surgeons down. We built a better way: HOLOLUX—the first AI-powered, glasses-free 3D medical imaging platform. Upload an MRI or CT and see a holographic scan you can rotate, zoom, and explore with your hands.
+        We’re a community of supporters—independent from the company—spotlighting a medical technology we
+        believe deserves to exist in every hospital. Through BagsApp, on-chain royalties from trading are
+        directed toward HOLOLUX’s continued research and engineering. Think of it as a crypto-native
+        fundraiser that helps pay for software milestones, hardware tests, and deployment.
       </p>
 
-      <h2>A New Way to See Inside the Human Body</h2>
+      <h2>How Community Funding Works</h2>
+      <ul class="checklist">
+        <li>Launched on BagsApp with royalties earmarked to a development treasury.</li>
+        <li>Supporters help by holding or trading; fees accumulate transparently on-chain.</li>
+        <li>Progress updates and discussion happen in the open community.</li>
+        <li>This site promotes the fundraiser—not a coin “from the company.”</li>
+      </ul>
+
+      <h2>What Your Support Accelerates</h2>
       <ul class="checklist">
         <li><strong>AI super-resolution</strong> that sharpens MRI/CT scans</li>
         <li><strong>Infrared hand-tracking</strong> for direct interaction</li>
         <li><strong>Autostereoscopic 3D displays</strong> — no headset required</li>
-      </ul>
-
-      <h2>Why This Matters</h2>
-      <ul class="checklist">
-        <li>Founder is fully doxxed with Ivy credentials</li>
-        <li>Prototype is live and functional</li>
-        <li>Real technology solving real clinical problems</li>
       </ul>
     </section>
 
@@ -257,7 +271,6 @@
     <section class="section card">
       <h2>Join the Conversation</h2>
 
-      <!-- Removed doctor's handle card per request; keep only the community link -->
       <div class="link-card">
         <div>
           <div class="handle">HOLOLUX Community</div>
@@ -298,7 +311,7 @@
       });
     });
 
-    // ---- NEW: Live video slider controls ----
+    // ---- Live video slider controls ----
     const track = document.getElementById('videoTrack');
     const v0 = document.getElementById('vid0');
     const v1 = document.getElementById('vid1');
@@ -315,16 +328,14 @@
     function show(i){
       idx = (i + videoSrcs.length) % videoSrcs.length;
       track.style.transform = `translateX(${idx===0 ? '0%' : '-50%'})`;
-      // Pause both when switching
       v0.pause(); v1.pause();
-      // Update download link to the current video
       dlBtn.href = videoSrcs[idx];
     }
     prevBtn.addEventListener('click', ()=> show(idx-1));
     nextBtn.addEventListener('click', ()=> show(idx+1));
-    show(0); // init
+    show(0);
 
-    // Remove any legacy “unsupported device” notes if present
+    // Clean up any legacy unsupported notices
     document.querySelectorAll('.mv-unsupported,.unsupported,.device-note')
       .forEach(el => el.remove());
   </script>
